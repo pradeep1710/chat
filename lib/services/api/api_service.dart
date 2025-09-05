@@ -229,6 +229,167 @@ class ApiService {
     }
   }
   
+  // Additional Chat APIs
+  Future<Map<String, dynamic>> archiveChat(String chatId) async {
+    try {
+      final response = await _dio.post('/chat/$chatId/archive');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> unarchiveChat(String chatId) async {
+    try {
+      final response = await _dio.delete('/chat/$chatId/archive');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteChat(String chatId) async {
+    try {
+      final response = await _dio.delete('/chat/$chatId');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> muteChat(String chatId, int duration) async {
+    try {
+      final response = await _dio.post('/chat/$chatId/mute', data: {
+        'duration': duration,
+      });
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> unmuteChat(String chatId) async {
+    try {
+      final response = await _dio.delete('/chat/$chatId/mute');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  // Status APIs
+  Future<Map<String, dynamic>> getStatusFeed({int page = 1, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/status/feed', queryParameters: {
+        'page': page,
+        'limit': limit,
+      });
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> getMyStatuses({int page = 1, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/status/my', queryParameters: {
+        'page': page,
+        'limit': limit,
+      });
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> createStatus({
+    required String type,
+    required String content,
+    String? privacy,
+    String? mediaPath,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'type': type,
+        'content': content,
+        'privacy': privacy ?? 'public',
+      });
+
+      if (mediaPath != null) {
+        formData.files.add(
+          MapEntry('media', await MultipartFile.fromFile(mediaPath)),
+        );
+      }
+
+      final response = await _dio.post('/status', data: formData);
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteStatus(String statusId) async {
+    try {
+      final response = await _dio.delete('/status/$statusId');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  // Community APIs
+  Future<Map<String, dynamic>> searchCommunities(String query, {int page = 1, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/community/search', queryParameters: {
+        'q': query,
+        'page': page,
+        'limit': limit,
+      });
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> getUserCommunities({int page = 1, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/community', queryParameters: {
+        'page': page,
+        'limit': limit,
+      });
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> joinCommunity(String communityId) async {
+    try {
+      final response = await _dio.post('/community/$communityId/join');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> leaveCommunity(String communityId) async {
+    try {
+      final response = await _dio.post('/community/$communityId/leave');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> muteCommunity(String communityId) async {
+    try {
+      final response = await _dio.post('/community/$communityId/mute');
+      return response.data;
+    } catch (e) {
+      throw _handleDioException(e);
+    }
+  }
+
   // Media APIs
   Future<Map<String, dynamic>> uploadMedia(String filePath) async {
     try {
@@ -242,7 +403,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Exception _handleDioException(dynamic e) {
     if (e is DioException) {
       return Exception(e.response?.data['message'] ?? e.message);
