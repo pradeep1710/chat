@@ -1,7 +1,7 @@
 class AppConfig {
   // API Configuration
-  static const String baseUrl = 'http://localhost:3000/api';
-  static const String socketUrl = 'http://localhost:3000';
+  static const String baseUrl = 'http://192.168.1.37:3000/api';
+  static const String socketUrl = 'http://192.168.1.37:3000';
   
   // For production, use your actual server URL:
   // static const String baseUrl = 'https://your-server.com/api';

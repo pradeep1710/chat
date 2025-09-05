@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:get/get.dart' as getx;
 
@@ -6,11 +8,11 @@ import '../../core/constants/app_config.dart';
 class ApiService {
   late Dio _dio;
   String? _authToken;
-  
+
   ApiService() {
     _initializeDio();
   }
-  
+
   void _initializeDio() {
     _dio = Dio(BaseOptions(
       baseUrl: AppConfig.baseUrl,
@@ -22,7 +24,7 @@ class ApiService {
         'Accept': 'application/json',
       },
     ));
-    
+
     // Add interceptors
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
@@ -33,7 +35,8 @@ class ApiService {
         handler.next(options);
       },
       onResponse: (response, handler) {
-        print('API Response: ${response.statusCode} ${response.requestOptions.uri}');
+        print(
+            'API Response: ${response.statusCode} ${response.requestOptions.uri}');
         handler.next(response);
       },
       onError: (error, handler) {
@@ -43,10 +46,10 @@ class ApiService {
       },
     ));
   }
-  
+
   void _handleError(DioException error) {
     String message = 'An error occurred';
-    
+
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -74,31 +77,32 @@ class ApiService {
       default:
         message = 'Something went wrong';
     }
-    
+
     getx.Get.snackbar('Error', message);
   }
-  
+
   void setAuthToken(String token) {
     _authToken = token;
   }
-  
+
   void clearAuthToken() {
     _authToken = null;
   }
-  
+
   // Authentication APIs
   Future<Map<String, dynamic>> sendOtp(String phoneNumber) async {
     try {
-      final response = await _dio.post('/auth/send-otp', data: {
-        'phoneNumber': phoneNumber,
-      });
+      final response = await _dio.post('/auth/send-otp',
+          data: {'phoneNumber': phoneNumber, 'username': "User"});
       return response.data;
     } catch (e) {
+      log("eror ssfa $e");
       throw _handleDioException(e);
     }
   }
-  
-  Future<Map<String, dynamic>> verifyOtp(String phoneNumber, String otp, String username) async {
+
+  Future<Map<String, dynamic>> verifyOtp(
+      String phoneNumber, String otp, String username) async {
     try {
       final response = await _dio.post('/auth/verify-otp', data: {
         'phoneNumber': phoneNumber,
@@ -110,7 +114,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> getProfile() async {
     try {
       final response = await _dio.get('/auth/profile');
@@ -119,7 +123,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> updateProfile({
     String? username,
     String? status,
@@ -132,14 +136,14 @@ class ApiService {
       if (status != null) data['status'] = status;
       if (profilePicture != null) data['profilePicture'] = profilePicture;
       if (privacySettings != null) data['privacySettings'] = privacySettings;
-      
+
       final response = await _dio.put('/user/profile', data: data);
       return response.data;
     } catch (e) {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> logout() async {
     try {
       final response = await _dio.post('/auth/logout');
@@ -148,7 +152,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   // Chat APIs
   Future<Map<String, dynamic>> getChats({int page = 1, int limit = 20}) async {
     try {
@@ -161,7 +165,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> createPrivateChat(String userId) async {
     try {
       final response = await _dio.post('/chat/private', data: {
@@ -172,24 +176,27 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
-  Future<Map<String, dynamic>> getChatMessages(String chatId, {int page = 1, int limit = 50, String? before}) async {
+
+  Future<Map<String, dynamic>> getChatMessages(String chatId,
+      {int page = 1, int limit = 50, String? before}) async {
     try {
       final queryParams = <String, dynamic>{
         'page': page,
         'limit': limit,
       };
       if (before != null) queryParams['before'] = before;
-      
-      final response = await _dio.get('/chat/$chatId/messages', queryParameters: queryParams);
+
+      final response = await _dio.get('/chat/$chatId/messages',
+          queryParameters: queryParams);
       return response.data;
     } catch (e) {
       throw _handleDioException(e);
     }
   }
-  
+
   // User APIs
-  Future<Map<String, dynamic>> searchUsers(String query, {int page = 1, int limit = 20}) async {
+  Future<Map<String, dynamic>> searchUsers(String query,
+      {int page = 1, int limit = 20}) async {
     try {
       final response = await _dio.get('/user/search', queryParameters: {
         'q': query,
@@ -201,7 +208,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> getUserById(String userId) async {
     try {
       final response = await _dio.get('/user/$userId');
@@ -210,7 +217,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> blockUser(String userId) async {
     try {
       final response = await _dio.post('/user/block/$userId');
@@ -219,7 +226,7 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   Future<Map<String, dynamic>> unblockUser(String userId) async {
     try {
       final response = await _dio.post('/user/unblock/$userId');
@@ -228,21 +235,21 @@ class ApiService {
       throw _handleDioException(e);
     }
   }
-  
+
   // Media APIs
   Future<Map<String, dynamic>> uploadMedia(String filePath) async {
     try {
       final formData = FormData.fromMap({
         'media': await MultipartFile.fromFile(filePath),
       });
-      
+
       final response = await _dio.post('/media/upload', data: formData);
       return response.data;
     } catch (e) {
       throw _handleDioException(e);
     }
   }
-  
+
   Exception _handleDioException(dynamic e) {
     if (e is DioException) {
       return Exception(e.response?.data['message'] ?? e.message);
