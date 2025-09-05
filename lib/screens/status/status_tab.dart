@@ -22,7 +22,7 @@ class StatusTab extends GetView<StatusController> {
 
     return Scaffold(
       body: Obx(() {
-        if (controller.isLoading.value && controller.statuses.isEmpty) {
+        if (controller.isLoading && controller.statuses.isEmpty) {
           return _buildShimmerLoading();
         }
 
@@ -65,7 +65,7 @@ class StatusTab extends GetView<StatusController> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           if (index == controller.statuses.length) {
-                            return controller.hasMore.value
+                            return controller.hasMore
                                 ? const Padding(
                                     padding: EdgeInsets.all(16.0),
                                     child: Center(
@@ -81,7 +81,7 @@ class StatusTab extends GetView<StatusController> {
                           return _buildStatusTile(status);
                         },
                         childCount: controller.statuses.length + 
-                                   (controller.hasMore.value ? 1 : 0),
+                                   (controller.hasMore ? 1 : 0),
                       ),
                     ),
             ],

@@ -101,7 +101,7 @@ class SettingsScreen extends GetView<SettingsController> {
               'Notifications',
               [
                 _buildSettingsTile(
-                  icon: Icons.notifications_outline,
+                  icon: Icons.notifications_outlined,
                   title: 'Notifications',
                   subtitle: 'Message, group & call tones',
                   onTap: () => Get.toNamed(AppRoutes.notifications),

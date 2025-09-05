@@ -54,7 +54,7 @@ class CommunitiesTab extends GetView<CommunityController> {
           // Communities list
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value && controller.communities.isEmpty) {
+              if (controller.isLoading && controller.communities.isEmpty) {
                 return _buildShimmerLoading();
               }
 
@@ -71,7 +71,7 @@ class CommunitiesTab extends GetView<CommunityController> {
                 color: AppColors.primary,
                 child: ListView.builder(
                   itemCount: controller.communities.length + 
-                             (controller.hasMore.value ? 1 : 0),
+                             (controller.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == controller.communities.length) {
                       // Loading indicator for pagination

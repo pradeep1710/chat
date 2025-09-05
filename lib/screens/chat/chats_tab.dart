@@ -30,7 +30,7 @@ class ChatsTab extends GetView<ChatController> {
           // Chat list
           Expanded(
             child: Obx(() {
-              if (controller.isLoading.value && controller.chats.isEmpty) {
+              if (controller.isLoading && controller.chats.isEmpty) {
                 return _buildShimmerLoading();
               }
 
@@ -47,7 +47,7 @@ class ChatsTab extends GetView<ChatController> {
                 color: AppColors.primary,
                 child: ListView.builder(
                   itemCount: controller.chats.length + 
-                             (controller.hasMore.value ? 1 : 0),
+                             (controller.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == controller.chats.length) {
                       // Loading indicator for pagination
@@ -281,7 +281,7 @@ class ChatsTab extends GetView<ChatController> {
       style: TextStyle(
         color: AppColors.onSurfaceVariant,
         fontSize: 14,
-        fontWeight: chat.hasUnreadMessages(currentUserId) 
+        fontWeight: lastMessage.hasUnreadMessages(currentUserId) 
             ? FontWeight.w500 
             : FontWeight.normal,
       ),

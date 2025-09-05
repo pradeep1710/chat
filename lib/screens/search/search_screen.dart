@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchController;
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -57,7 +57,7 @@ class SearchScreen extends GetView<SearchController> {
       body: Column(
         children: [
           // Recent searches or suggestions
-          Obx(() => controller.searchQuery.value.isEmpty
+          Obx(() => controller.searchQuery.isEmpty
               ? _buildRecentSearches()
               : const SizedBox.shrink()),
           
@@ -135,11 +135,11 @@ class SearchScreen extends GetView<SearchController> {
   }
 
   Widget _buildSearchResults() {
-    if (controller.searchQuery.value.isEmpty) {
+    if (controller.searchQuery.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    if (controller.isLoading.value) {
+    if (controller.isLoading) {
       return _buildShimmerLoading();
     }
 

@@ -28,7 +28,7 @@ class StatusCreateScreen extends GetView<StatusCreateController> {
           Obx(() => controller.selectedMedia.value != null
               ? IconButton(
                   onPressed: controller.postStatus,
-                  icon: controller.isPosting.value
+                  icon: controller.isPosting
                       ? const SizedBox(
                           width: 20,
                           height: 20,
@@ -115,7 +115,7 @@ class StatusCreateScreen extends GetView<StatusCreateController> {
                 _buildToolButton(
                   icon: Icons.brush,
                   onTap: () => controller.toggleDrawing(),
-                  isActive: controller.isDrawing.value,
+                  isActive: controller.isDrawing,
                 ),
                 const SizedBox(height: 12),
                 _buildToolButton(
@@ -188,7 +188,7 @@ class StatusCreateScreen extends GetView<StatusCreateController> {
               itemCount: controller.backgroundColors.length,
               itemBuilder: (context, index) {
                 final color = controller.backgroundColors[index];
-                final isSelected = controller.selectedBackgroundIndex.value == index;
+                final isSelected = controller.selectedBackgroundIndex == index;
                 
                 return GestureDetector(
                   onTap: () => controller.selectBackground(index),
@@ -224,7 +224,7 @@ class StatusCreateScreen extends GetView<StatusCreateController> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: Obx(() => controller.selectedBackground),
+                gradient:controller.selectedBackground,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TextField(
@@ -262,7 +262,7 @@ class StatusCreateScreen extends GetView<StatusCreateController> {
               itemCount: controller.fonts.length,
               itemBuilder: (context, index) {
                 final font = controller.fonts[index];
-                final isSelected = controller.selectedFontIndex.value == index;
+                final isSelected = controller.selectedFontIndex == index;
                 
                 return GestureDetector(
                   onTap: () => controller.selectFont(index),

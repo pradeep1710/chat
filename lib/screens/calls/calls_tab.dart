@@ -20,7 +20,7 @@ class CallsTab extends GetView<CallsController> {
 
     return Scaffold(
       body: Obx(() {
-        if (controller.isLoading.value && controller.calls.isEmpty) {
+        if (controller.isLoading&& controller.calls.isEmpty) {
           return _buildShimmerLoading();
         }
 
@@ -37,7 +37,7 @@ class CallsTab extends GetView<CallsController> {
           color: AppColors.primary,
           child: ListView.builder(
             itemCount: controller.calls.length + 
-                       (controller.hasMore.value ? 1 : 0),
+                       (controller.hasMore ? 1 : 0),
             itemBuilder: (context, index) {
               if (index == controller.calls.length) {
                 // Loading indicator for pagination

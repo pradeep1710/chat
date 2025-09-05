@@ -130,7 +130,7 @@ class HomeScreen extends GetView<AuthController> {
               animation: tabController,
               builder: (context, child) {
                 final tabIndex = tabController.index;
-                
+
                 switch (tabIndex) {
                   case 0: // Chats
                     return FloatingActionButton(

@@ -213,7 +213,7 @@ class ChatDetailController extends GetxController {
     }
   }
 
-  void replyToMessage(MessageModel message) {
+  void replyToMessageFn(MessageModel message) {
     _replyToMessage.value = message.id;
     messageFocusNode.requestFocus();
   }

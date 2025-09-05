@@ -146,7 +146,7 @@ class ChatDetailScreen extends GetView<ChatDetailController> {
   }
 
   Widget _buildMessagesList() {
-    if (controller.isLoading.value && controller.messages.isEmpty) {
+    if (controller.isLoading && controller.messages.isEmpty) {
       return _buildShimmerLoading();
     }
 
@@ -190,7 +190,7 @@ class ChatDetailScreen extends GetView<ChatDetailController> {
         controller: controller.scrollController,
         padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: controller.messages.length + 
-                   (controller.hasMore.value ? 1 : 0),
+                   (controller.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == controller.messages.length) {
             return const Padding(
@@ -298,7 +298,7 @@ class ChatDetailScreen extends GetView<ChatDetailController> {
                       color: AppColors.onSurfaceVariant,
                     ),
                   ),
-                  Obx(() => controller.messageText.value.trim().isEmpty
+                  Obx(() => controller.messageText.trim().isEmpty
                       ? IconButton(
                           onPressed: () => _openCamera(),
                           icon: const Icon(
@@ -314,12 +314,12 @@ class ChatDetailScreen extends GetView<ChatDetailController> {
           const SizedBox(width: 8),
           Obx(() => FloatingActionButton(
             mini: true,
-            onPressed: controller.messageText.value.trim().isEmpty
+            onPressed: controller.messageText.trim().isEmpty
                 ? () => _recordVoiceMessage()
                 : controller.sendMessage,
             backgroundColor: AppColors.primary,
             child: Icon(
-              controller.messageText.value.trim().isEmpty
+              controller.messageText.trim().isEmpty
                   ? Icons.mic
                   : Icons.send,
               color: Colors.white,
@@ -544,7 +544,7 @@ class ChatDetailScreen extends GetView<ChatDetailController> {
               title: const Text('Reply'),
               onTap: () {
                 Get.back();
-                controller.replyToMessage(message);
+                controller.replyToMessageFn(message);
               },
             ),
             ListTile(

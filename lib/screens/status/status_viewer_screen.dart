@@ -14,8 +14,9 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
   Widget build(BuildContext context) {
     final List<dynamic> statuses = Get.arguments['statuses'];
     final int initialIndex = Get.arguments['initialIndex'] ?? 0;
-    
-    Get.put(StatusViewerController(statuses: statuses, initialIndex: initialIndex));
+
+    Get.put(
+        StatusViewerController(statuses: statuses, initialIndex: initialIndex));
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -31,13 +32,13 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
               return _buildStatusContent(status);
             },
           ),
-          
+
           // Top overlay
           _buildTopOverlay(),
-          
+
           // Bottom overlay
           _buildBottomOverlay(),
-          
+
           // Progress indicators
           _buildProgressIndicators(),
         ],
@@ -88,7 +89,7 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
   Widget _buildVideoStatus(dynamic status) {
     return Obx(() {
       final videoController = controller.currentVideoController;
-      
+
       if (videoController == null || !videoController.value.isInitialized) {
         return const Center(
           child: CircularProgressIndicator(color: Colors.white),
@@ -192,12 +193,16 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
                         CircleAvatar(
                           radius: 18,
                           backgroundColor: AppColors.primary,
-                          backgroundImage: currentStatus['user']?['profilePicture'] != null
-                              ? CachedNetworkImageProvider(currentStatus['user']['profilePicture'])
-                              : null,
-                          child: currentStatus['user']?['profilePicture'] == null
+                          backgroundImage:
+                              currentStatus['user']?['profilePicture'] != null
+                                  ? CachedNetworkImageProvider(
+                                      currentStatus['user']['profilePicture'])
+                                  : null,
+                          child: currentStatus['user']?['profilePicture'] ==
+                                  null
                               ? Text(
-                                  (currentStatus['user']?['username'] ?? 'U')[0].toUpperCase(),
+                                  (currentStatus['user']?['username'] ?? 'U')[0]
+                                      .toUpperCase(),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -298,10 +303,12 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
                 GestureDetector(
                   onTap: () => controller.toggleLike(),
                   child: Obx(() => Icon(
-                    controller.isLiked.value ? Icons.favorite : Icons.favorite_border,
-                    color: controller.isLiked.value ? Colors.red : Colors.white,
-                    size: 28,
-                  )),
+                        controller.isLiked
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: controller.isLiked ? Colors.red : Colors.white,
+                        size: 28,
+                      )),
                 ),
               ],
             ),
@@ -321,32 +328,33 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
           height: 4,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Obx(() => Row(
-            children: List.generate(
-              controller.statuses.length,
-              (index) => Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                  child: LinearProgressIndicator(
-                    value: _getProgressValue(index),
-                    backgroundColor: Colors.white30,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                children: List.generate(
+                  controller.statuses.length,
+                  (index) => Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 1),
+                      child: LinearProgressIndicator(
+                        value: _getProgressValue(index),
+                        backgroundColor: Colors.white30,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          )),
+              )),
         ),
       ),
     );
   }
 
   double _getProgressValue(int index) {
-    final currentIndex = controller.currentIndex.value;
-    
+    final currentIndex = controller.currentIndex;
+
     if (index < currentIndex) {
       return 1.0; // Completed
     } else if (index == currentIndex) {
-      return controller.progress.value; // Current progress
+      return controller.progress; // Current progress
     } else {
       return 0.0; // Not started
     }
@@ -354,7 +362,7 @@ class StatusViewerScreen extends GetView<StatusViewerController> {
 
   String _formatTime(dynamic timestamp) {
     if (timestamp == null) return '';
-    
+
     final dateTime = DateTime.parse(timestamp.toString());
     final now = DateTime.now();
     final difference = now.difference(dateTime);
