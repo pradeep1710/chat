@@ -14,6 +14,7 @@ class AppRoutes {
   static const String settings = '/settings';
   
   // Chat Routes
+  static const String newChat = '/new-chat';
   static const String chatDetail = '/chat-detail';
   static const String chatInfo = '/chat-info';
   static const String mediaViewer = '/media-viewer';

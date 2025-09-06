@@ -134,7 +134,7 @@ class HomeScreen extends GetView<AuthController> {
                 switch (tabIndex) {
                   case 0: // Chats
                     return FloatingActionButton(
-                      onPressed: () => Get.toNamed(AppRoutes.contactPicker),
+                      onPressed: () => Get.toNamed(AppRoutes.newChat),
                       backgroundColor: AppColors.primary,
                       child: const Icon(Icons.chat, color: Colors.white),
                     );

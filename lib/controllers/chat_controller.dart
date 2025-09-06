@@ -11,37 +11,33 @@ class ChatController extends GetxController {
   final SocketService _socketService = Get.find<SocketService>();
   
   // Observable variables
-  final RxList<ChatModel> _chats = <ChatModel>[].obs;
-  final RxBool _isLoading = false.obs;
-  final RxBool _hasMore = true.obs;
-  final RxInt _currentPage = 1.obs;
-  
-  // Getters
-  List<ChatModel> get chats => _chats;
-  bool get isLoading => _isLoading.value;
-  bool get hasMore => _hasMore.value;
-  int get currentPage => _currentPage.value;
+  final RxList<ChatModel> chats = <ChatModel>[].obs;
+  final RxBool isLoading = false.obs;
+  final RxBool hasMore = true.obs;
+  final RxInt currentPage = 1.obs;
   
   @override
   void onInit() {
     super.onInit();
     loadChats();
+    _socketService.connect();
+    _socketService.onNewMessage(onNewMessage);
   }
   
   Future<void> loadChats({bool refresh = false}) async {
     try {
       if (refresh) {
-        _currentPage.value = 1;
-        _hasMore.value = true;
-        _chats.clear();
+        currentPage.value = 1;
+        hasMore.value = true;
+        chats.clear();
       }
       
-      if (!_hasMore.value || _isLoading.value) return;
+      if (!hasMore.value || isLoading.value) return;
       
-      _isLoading.value = true;
+      isLoading.value = true;
       
       final response = await _apiService.getChats(
-        page: _currentPage.value,
+        page: currentPage.value,
         limit: 20,
       );
       
@@ -51,19 +47,19 @@ class ChatController extends GetxController {
             .toList();
         
         if (refresh) {
-          _chats.value = chatList;
+          chats.value = chatList;
         } else {
-          _chats.addAll(chatList);
+          chats.addAll(chatList);
         }
         
-        _currentPage.value++;
-        _hasMore.value = chatList.length >= 20;
+        currentPage.value++;
+        hasMore.value = chatList.length >= 20;
       }
     } catch (e) {
       print('Error loading chats: $e');
       Get.snackbar('Error', 'Failed to load chats');
     } finally {
-      _isLoading.value = false;
+      isLoading.value = false;
     }
   }
   
@@ -75,7 +71,7 @@ class ChatController extends GetxController {
     try {
       final response = await _apiService.archiveChat(chatId);
       if (response['success'] == true) {
-        _chats.removeWhere((chat) => chat.id == chatId);
+        chats.removeWhere((chat) => chat.id == chatId);
         Get.snackbar('Success', 'Chat archived');
       }
     } catch (e) {
@@ -88,7 +84,7 @@ class ChatController extends GetxController {
     try {
       final response = await _apiService.deleteChat(chatId);
       if (response['success'] == true) {
-        _chats.removeWhere((chat) => chat.id == chatId);
+        chats.removeWhere((chat) => chat.id == chatId);
         Get.snackbar('Success', 'Chat deleted');
       }
     } catch (e) {
@@ -99,15 +95,15 @@ class ChatController extends GetxController {
   
   Future<void> toggleMuteChat(String chatId) async {
     try {
-      final chat = _chats.firstWhere((c) => c.id == chatId);
+      final chat = chats.firstWhere((c) => c.id == chatId);
       final response = chat.isMuted 
           ? await _apiService.unmuteChat(chatId)
           : await _apiService.muteChat(chatId, 3600000); // 1 hour
       
       if (response['success'] == true) {
-        final index = _chats.indexWhere((c) => c.id == chatId);
+        final index = chats.indexWhere((c) => c.id == chatId);
         if (index != -1) {
-          _chats[index] = chat.copyWith(isMuted: !chat.isMuted);
+          chats[index] = chat.copyWith(isMuted: !chat.isMuted);
         }
         Get.snackbar('Success', chat.isMuted ? 'Chat unmuted' : 'Chat muted');
       }
@@ -122,7 +118,7 @@ class ChatController extends GetxController {
       final response = await _apiService.blockUser(userId);
       if (response['success'] == true) {
         // Remove chats with blocked user
-        _chats.removeWhere((chat) => 
+        chats.removeWhere((chat) => 
             chat.type == ChatType.private && 
             chat.participants.any((p) => p.id == userId));
         Get.snackbar('Success', 'User blocked');
@@ -134,9 +130,9 @@ class ChatController extends GetxController {
   }
   
   void updateChatLastMessage(String chatId, MessageModel message) {
-    final index = _chats.indexWhere((chat) => chat.id == chatId);
+    final index = chats.indexWhere((chat) => chat.id == chatId);
     if (index != -1) {
-      final chat = _chats[index];
+      final chat = chats[index];
       final authController = Get.find<AuthController>();
       final currentUserId = authController.currentUser?.id ?? '';
       
@@ -146,34 +142,35 @@ class ChatController extends GetxController {
         newUnreadCount[currentUserId] = (newUnreadCount[currentUserId] ?? 0) + 1;
       }
       
-      _chats[index] = chat.copyWith(
+      chats[index] = chat.copyWith(
         lastMessage: message,
         lastMessageAt: message.createdAt,
         unreadCount: newUnreadCount,
       );
       
       // Move chat to top
-      final updatedChat = _chats.removeAt(index);
-      _chats.insert(0, updatedChat);
+      final updatedChat = chats.removeAt(index);
+      chats.insert(0, updatedChat);
     }
   }
   
   void markChatAsRead(String chatId) {
-    final index = _chats.indexWhere((chat) => chat.id == chatId);
+    final index = chats.indexWhere((chat) => chat.id == chatId);
     if (index != -1) {
-      final chat = _chats[index];
+      final chat = chats[index];
       final authController = Get.find<AuthController>();
       final currentUserId = authController.currentUser?.id ?? '';
       
       final newUnreadCount = Map<String, int>.from(chat.unreadCount);
       newUnreadCount[currentUserId] = 0;
       
-      _chats[index] = chat.copyWith(unreadCount: newUnreadCount);
+      chats[index] = chat.copyWith(unreadCount: newUnreadCount);
     }
   }
   
   // Socket event handlers
-  void onNewMessage(MessageModel message) {
+  void onNewMessage(dynamic data) {
+    final message = MessageModel.fromJson(data['message']);
     print('New message received: ${message.content}');
     updateChatLastMessage(message.chatId, message);
   }

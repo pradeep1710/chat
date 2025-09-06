@@ -16,10 +16,7 @@ class ChatsTab extends GetView<ChatController> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize controller if not already done
-    if (!Get.isRegistered<ChatController>()) {
-      Get.put(ChatController());
-    }
+    Get.put(ChatController());
 
     return Scaffold(
       body: Column(
@@ -30,7 +27,7 @@ class ChatsTab extends GetView<ChatController> {
           // Chat list
           Expanded(
             child: Obx(() {
-              if (controller.isLoading && controller.chats.isEmpty) {
+              if (controller.isLoading.isTrue && controller.chats.isEmpty) {
                 return _buildShimmerLoading();
               }
 
@@ -47,7 +44,7 @@ class ChatsTab extends GetView<ChatController> {
                 color: AppColors.primary,
                 child: ListView.builder(
                   itemCount: controller.chats.length + 
-                             (controller.hasMore ? 1 : 0),
+                             (controller.hasMore.isTrue ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == controller.chats.length) {
                       // Loading indicator for pagination

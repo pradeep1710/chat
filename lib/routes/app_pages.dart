@@ -8,6 +8,7 @@ import '../screens/auth/profile_setup_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/chat/chat_detail_screen.dart';
 import '../screens/chat/chat_info_screen.dart';
+import '../screens/chat/new_chat_screen.dart';
 import '../screens/groups/group_create_screen.dart';
 import '../screens/groups/group_detail_screen.dart';
 import '../screens/groups/group_info_screen.dart';
@@ -80,6 +81,12 @@ class AppPages {
     ),
     
     // Chat Pages
+    GetPage(
+      name: AppRoutes.newChat,
+      page: () => const NewChatScreen(),
+      binding: ChatBinding(),
+      transition: Transition.rightToLeft,
+    ),
     GetPage(
       name: AppRoutes.chatDetail,
       page: () => const ChatDetailScreen(),
